@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { Sidebar } from "./_components/Sidebar";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,8 +29,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-muted/40">
-        {children}
+      <body className="min-h-screen flex bg-muted/40">
+        <Sidebar />
+        <main className="flex-1 min-w-0">{children}</main>
         <Toaster richColors position="top-right" />
       </body>
     </html>

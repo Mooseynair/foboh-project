@@ -17,14 +17,16 @@ export function ProfileBasicCard() {
   const completed = state.basicCompleted;
 
   return (
-    <Card>
+    <Card id="profile-basic-card">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
-        <div>
-          <h2 className="text-base font-semibold">Basic Pricing Profile</h2>
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold">
+            {completed && state.name ? state.name : "Basic Pricing Profile"}
+          </h2>
           <p className="text-sm text-muted-foreground">
-            {completed && state.description
-              ? state.description
-              : "Cheeky little description goes in here"}
+            {completed
+              ? state.description || "No description"
+              : "Name and describe this pricing profile"}
           </p>
         </div>
         <Badge variant={completed ? "default" : "secondary"} className="shrink-0">
@@ -68,7 +70,7 @@ export function ProfileBasicCard() {
               />
             </div>
             <div>
-              <Button type="submit" size="sm">
+              <Button type="submit" size="sm" disabled={!state.name.trim()}>
                 Mark as complete
               </Button>
             </div>

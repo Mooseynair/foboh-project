@@ -27,7 +27,7 @@ export function AssignCustomersCard({ customers, customerGroups }: Props) {
     state.selectedCustomerGroupIds.length > 0;
 
   return (
-    <Card>
+    <Card id="assign-customers-card">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-semibold">

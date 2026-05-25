@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { calculatePrice } from "../pricing";
+import { resolvePriceForSubject } from "../resolve";
 import type {
   Customer,
   CustomerGroup,
@@ -138,38 +138,9 @@ export function resolvePrice(
   const product = store.products.get(productId);
   if (!product) return { error: "product not found" };
 
-  const customerGroups = new Set(customer.groupIds);
-  const profiles = Array.from(store.profiles.values())
-    .filter((p) => {
-      const includesProduct = p.productIds.includes(productId);
-      const matchesCustomer =
-        p.customerIds.includes(customerId) ||
-        p.customerGroupIds.some((g) => customerGroups.has(g));
-      return includesProduct && matchesCustomer;
-    })
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-
-  if (profiles.length === 0) {
-    return {
-      price: product.basePrice,
-      basePrice: product.basePrice,
-      sourceProfileId: null,
-      why: "no matching profile — base price applies",
-    };
-  }
-
-  let best: { price: number; profile: PricingProfile } | null = null;
-  for (const profile of profiles) {
-    const price = calculatePrice(product.basePrice, profile.adjustment);
-    if (best === null || price < best.price) {
-      best = { price, profile };
-    }
-  }
-
-  return {
-    price: best!.price,
-    basePrice: product.basePrice,
-    sourceProfileId: best!.profile.id,
-    why: `lowest of ${profiles.length} matching profile${profiles.length === 1 ? "" : "s"} (placeholder rule)`,
-  };
+  return resolvePriceForSubject(
+    { kind: "customer", customerId, groupIds: customer.groupIds },
+    product,
+    Array.from(store.profiles.values()),
+  );
 }

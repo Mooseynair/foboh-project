@@ -42,7 +42,8 @@ export function ProductList({ products, selectedIds, onToggle }: Props) {
             >
               <span className="text-sm font-medium">{product.title}</span>
               <span className="text-xs text-muted-foreground">
-                SKU {product.sku} · {product.uom}
+                SKU <span className="font-mono">{product.sku}</span> ·{" "}
+                {product.uom}
               </span>
             </label>
           </li>

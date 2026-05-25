@@ -225,13 +225,26 @@ export function SelectProductPricingCard({
             Your entries are saved automatically
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost">Back</Button>
-            <Button>Next</Button>
+            <Button
+              variant="ghost"
+              onClick={() => scrollToCard("profile-basic-card")}
+            >
+              Back
+            </Button>
+            <Button onClick={() => scrollToCard("assign-customers-card")}>
+              Next
+            </Button>
           </div>
         </div>
       </CardContent>
     </Card>
   );
+}
+
+function scrollToCard(id: string) {
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function ScopeRow({

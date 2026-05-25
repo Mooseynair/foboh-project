@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -31,27 +33,51 @@ export function AdjustmentControls({ adjustment, onChange }: Props) {
     onChange({ ...adjustment, direction });
   };
 
-  const setValue = (raw: string) => {
-    const num = Number.parseFloat(raw);
-    const value = Number.isFinite(num) && num >= 0 ? num : 0;
-    onChange(
-      adjustment.mode === "fixed"
-        ? { ...adjustment, amount: value }
-        : { ...adjustment, percent: value },
-    );
-  };
-
   const value =
     adjustment.mode === "fixed" ? adjustment.amount : adjustment.percent;
   const symbol = adjustment.mode === "fixed" ? "$" : "%";
+
+  const [text, setText] = useState<string>(String(value));
+  // Sync local text when the form value changes from outside (e.g. mode toggle
+  // resets the default), but not on every keystroke we just made.
+  const lastValue = useRef(value);
+  useEffect(() => {
+    if (lastValue.current !== value) {
+      setText(String(value));
+      lastValue.current = value;
+    }
+  }, [value]);
+
+  const handleChange = (raw: string) => {
+    // Allow only digits and a single decimal point; strip negatives and any
+    // other characters so the field is numeric-only.
+    const cleaned = raw
+      .replace(/[^0-9.]/g, "")
+      .replace(/(\..*?)\..*/g, "$1");
+    setText(cleaned);
+    const num = cleaned === "" ? 0 : Number.parseFloat(cleaned);
+    if (!Number.isFinite(num) || num < 0) return;
+    lastValue.current = num;
+    onChange(
+      adjustment.mode === "fixed"
+        ? { ...adjustment, amount: num }
+        : { ...adjustment, percent: num },
+    );
+  };
+
+  const handleBlur = () => {
+    if (text === "" || text === ".") setText("0");
+  };
 
   return (
     <div className="space-y-4">
       <div className="grid gap-1.5">
         <Label>Based on</Label>
         <Select value="globalWholesale">
-          <SelectTrigger className="max-w-sm">
-            <SelectValue />
+          <SelectTrigger className="w-fit min-w-64">
+            <SelectValue>
+              {(v) => (v === "globalWholesale" ? "Global Wholesale Price" : v)}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="globalWholesale">
@@ -94,12 +120,12 @@ export function AdjustmentControls({ adjustment, onChange }: Props) {
           <Input
             id="adjustment-value"
             className="pl-12"
-            type="number"
+            type="text"
             inputMode="decimal"
-            min={0}
-            step="0.01"
-            value={Number.isNaN(value) ? "" : value}
-            onChange={(e) => setValue(e.target.value)}
+            autoComplete="off"
+            value={text}
+            onChange={(e) => handleChange(e.target.value)}
+            onBlur={handleBlur}
           />
         </div>
         <p className="text-xs text-muted-foreground">

@@ -92,8 +92,16 @@ function SelectFilter({
       value={value === "" ? ALL : value}
       onValueChange={(v) => onChange(!v || v === ALL ? "" : v)}
     >
-      <SelectTrigger>
-        <SelectValue placeholder={placeholder} />
+      <SelectTrigger className="w-full justify-between">
+        <SelectValue placeholder={placeholder}>
+          {(v) =>
+            v && v !== ALL ? (
+              v
+            ) : (
+              <span className="text-muted-foreground">{placeholder}</span>
+            )
+          }
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value={ALL}>All {placeholder.toLowerCase()}s</SelectItem>
