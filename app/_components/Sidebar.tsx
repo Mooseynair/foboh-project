@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FilePlus2, Layers, ShoppingCart } from "lucide-react";
+import { BookOpen, FilePlus2, Layers, ShoppingCart } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,11 @@ const links = [
     href: "/checkout",
     label: "Checkout Preview",
     icon: ShoppingCart,
+  },
+  {
+    href: "/api-docs",
+    label: "API Docs",
+    icon: BookOpen,
   },
 ];
 
