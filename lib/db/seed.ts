@@ -1,0 +1,67 @@
+import type { Customer, CustomerGroup, Product } from "../types";
+
+export const seedProducts: Product[] = [
+  {
+    id: "hgvpin216",
+    title: "High Garden Pinot Noir 2021",
+    sku: "HGVPIN216",
+    brand: "High Garden",
+    subCategory: "Wine",
+    segment: "Red",
+    basePrice: 279.06,
+    uom: "12 × 750ML Bottle Case",
+  },
+  {
+    id: "koybrunv6",
+    title: "Koyama Methode Brut Nature NV",
+    sku: "KOYBRUNV6",
+    brand: "Koyama Wines",
+    subCategory: "Wine",
+    segment: "Sparkling",
+    basePrice: 120.0,
+    uom: "6 × 750ML Bottle Case",
+  },
+  {
+    id: "koynr1837",
+    title: "Koyama Riesling 2018",
+    sku: "KOYNR1837",
+    brand: "Koyama Wines",
+    subCategory: "Wine",
+    segment: "Port/Dessert",
+    basePrice: 215.04,
+    uom: "12 × 375ML Bottle Case",
+  },
+  {
+    id: "koyrie19",
+    title: "Koyama Tussock Riesling 2019",
+    sku: "KOYRIE19",
+    brand: "Koyama Wines",
+    subCategory: "Wine",
+    segment: "White",
+    basePrice: 215.04,
+    uom: "12 × 750ML Bottle Case",
+  },
+  {
+    id: "lacbnatnv6",
+    title: "Lacourte-Godbillon Brut Cru NV",
+    sku: "LACBNATNV6",
+    brand: "Lacourte-Godbillon",
+    subCategory: "Wine",
+    segment: "Sparkling",
+    basePrice: 409.32,
+    uom: "6 × 750ML Bottle Case",
+  },
+];
+
+export const seedCustomerGroups: CustomerGroup[] = [
+  { id: "independent-retailers", name: "Independent Retailers" },
+  { id: "vip", name: "VIP" },
+];
+
+export const seedCustomers: Customer[] = [
+  {
+    id: "bondi-cellars",
+    name: "Bondi Cellars",
+    groupIds: ["independent-retailers", "vip"],
+  },
+];
