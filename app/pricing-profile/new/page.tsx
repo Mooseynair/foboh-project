@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import {
   listCustomerGroups,
@@ -8,7 +10,7 @@ import { ProfileBasicCard } from "./_components/ProfileBasicCard";
 import { SelectProductPricingCard } from "./_components/SelectProductPricingCard";
 import { AssignCustomersCard } from "./_components/AssignCustomersCard";
 import { ProfileFormProvider } from "./_components/ProfileFormProvider";
-import { SaveAsDraftButton } from "./_components/SaveAsDraftButton";
+import { SaveAndPublishButton } from "./_components/SaveAndPublishButton";
 
 export default async function NewPricingProfilePage() {
   const [products, customers, customerGroups] = await Promise.all([
@@ -24,20 +26,14 @@ export default async function NewPricingProfilePage() {
   return (
     <ProfileFormProvider>
       <div className="mx-auto w-full max-w-5xl px-6 py-8">
-        <header className="mb-6 flex items-center justify-between">
-          <div>
-            <nav className="text-sm text-muted-foreground">
-              Pricing Profile <span className="mx-1">›</span>
-              <span className="text-foreground">Setup a Profile</span>
-            </nav>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Setup your pricing profile, select products and assign customers
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost">Cancel</Button>
-            <SaveAsDraftButton />
-          </div>
+        <header className="mb-6">
+          <nav className="text-sm text-muted-foreground">
+            Pricing Profile <span className="mx-1">›</span>
+            <span className="text-foreground">Setup a Profile</span>
+          </nav>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Setup your pricing profile, select products and assign customers
+          </p>
         </header>
 
         <div className="space-y-4">
@@ -52,6 +48,13 @@ export default async function NewPricingProfilePage() {
             customers={customers}
             customerGroups={customerGroups}
           />
+        </div>
+
+        <div className="mt-6 flex items-center justify-end gap-2 border-t pt-6">
+          <Link href="/profiles">
+            <Button variant="outline">Cancel</Button>
+          </Link>
+          <SaveAndPublishButton />
         </div>
       </div>
     </ProfileFormProvider>

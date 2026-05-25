@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCcw } from "lucide-react";
+import { Pencil, RefreshCcw } from "lucide-react";
 import { useDeferredValue, useMemo, useState } from "react";
 import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { formatAdjustment } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
 import { AdjustmentControls } from "./AdjustmentControls";
 import { PreviewTable } from "./PreviewTable";
@@ -52,8 +53,14 @@ export function SelectProductPricingCard({
   brands,
 }: Props) {
   const { state } = useProfileForm();
-  const { setScope, toggleProduct, setProducts, setAdjustment } =
-    useProfileFormActions();
+  const {
+    setScope,
+    toggleProduct,
+    setProducts,
+    setAdjustment,
+    markProductsCompleted,
+  } = useProfileFormActions();
+  const completed = state.productsCompleted;
 
   const [filters, setFilters] = useState<ProductFilterState>(emptyFilters);
   const deferredFilters = useDeferredValue(filters);
@@ -118,133 +125,149 @@ export function SelectProductPricingCard({
     }
   };
 
+  const productCount = state.selectedProductIds.length;
+  const modeLabel = state.adjustment.mode === "fixed" ? "Fixed" : "Dynamic";
+  const summary = productCount
+    ? `${productCount} product${productCount === 1 ? "" : "s"} selected · ${formatAdjustment(state.adjustment)} (${modeLabel})`
+    : "No products selected";
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-base font-semibold">Select Product Pricing</h2>
-            <p className="text-sm text-muted-foreground">Set details</p>
-          </div>
-          <Badge variant="secondary" className="shrink-0">
-            {state.selectedProductIds.length} selected
-          </Badge>
+    <Card id="select-products-card">
+      <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold">Select Product Pricing</h2>
+          <p className="text-sm text-muted-foreground">
+            {completed ? summary : "Set details"}
+          </p>
         </div>
+        <Badge
+          variant={completed ? "default" : "secondary"}
+          className={
+            completed
+              ? "shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300"
+              : "shrink-0"
+          }
+        >
+          {completed ? "● Completed" : "● Not Started"}
+        </Badge>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label>You are creating a Pricing Profile for</Label>
-          <RadioGroup
-            value={state.scope}
-            onValueChange={(v) => setScope(v as ProductScope)}
-            className="flex flex-wrap gap-6"
+      <CardContent className={completed ? undefined : "space-y-6"}>
+        {completed ? (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => markProductsCompleted(false)}
           >
-            <ScopeRow id="scope-one" value="one" label="One Product" />
-            <ScopeRow
-              id="scope-multiple"
-              value="multiple"
-              label="Multiple Products"
-            />
-            <ScopeRow id="scope-all" value="all" label="All Products" />
-          </RadioGroup>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Search for Products</Label>
-          <ProductSearchFilters
-            value={filters}
-            onChange={setFilters}
-            categories={categories}
-            segments={segments}
-            brands={brands}
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">
-            Showing ({products.length} Result{products.length === 1 ? "" : "s"})
-            {filters.q || filters.sku ? " for " : ""}
-          </span>
-          {(filters.q || filters.sku) && (
-            <Badge variant="outline">
-              {filters.q || filters.sku} (Product Name or SKU Code)
-            </Badge>
-          )}
-          {activeFilterChips.map((chip) => (
-            <Badge key={chip.key} variant="outline">
-              {chip.label}
-            </Badge>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-4 text-sm">
-          <button
-            type="button"
-            onClick={toggleSelectAll}
-            className="font-medium text-primary hover:underline"
-          >
-            {allVisibleSelected ? "Deselect All" : "Select all"}
-          </button>
-          {state.selectedProductIds.length > 0 && (
-            <span className="text-muted-foreground">
-              You&apos;ve selected {state.selectedProductIds.length} product
-              {state.selectedProductIds.length === 1 ? "" : "s"}, these will be
-              added to this profile
-            </span>
-          )}
-        </div>
-
-        <ProductList
-          products={products}
-          selectedIds={selectedIds}
-          onToggle={toggleProduct}
-        />
-
-        <Separator />
-
-        <AdjustmentControls
-          adjustment={state.adjustment}
-          onChange={setAdjustment}
-        />
-
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium">Preview new prices</p>
-          <Button variant="ghost" size="sm" className="text-primary">
-            <RefreshCcw className="mr-1 size-3.5" />
-            Refresh New Price Table
+            <Pencil className="mr-1 size-3.5" />
+            Make Changes
           </Button>
-        </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label>You are creating a Pricing Profile for</Label>
+              <RadioGroup
+                value={state.scope}
+                onValueChange={(v) => setScope(v as ProductScope)}
+                className="flex flex-wrap gap-6"
+              >
+                <ScopeRow id="scope-one" value="one" label="One Product" />
+                <ScopeRow
+                  id="scope-multiple"
+                  value="multiple"
+                  label="Multiple Products"
+                />
+                <ScopeRow id="scope-all" value="all" label="All Products" />
+              </RadioGroup>
+            </div>
 
-        <PreviewTable
-          products={selectedProducts}
-          adjustment={state.adjustment}
-        />
+            <div className="space-y-2">
+              <Label>Search for Products</Label>
+              <ProductSearchFilters
+                value={filters}
+                onChange={setFilters}
+                categories={categories}
+                segments={segments}
+                brands={brands}
+              />
+            </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <span className="text-xs text-muted-foreground">
-            Your entries are saved automatically
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => scrollToCard("profile-basic-card")}
-            >
-              Back
-            </Button>
-            <Button onClick={() => scrollToCard("assign-customers-card")}>
-              Next
-            </Button>
-          </div>
-        </div>
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-muted-foreground">
+                Showing ({products.length} Result
+                {products.length === 1 ? "" : "s"})
+                {filters.q || filters.sku ? " for " : ""}
+              </span>
+              {(filters.q || filters.sku) && (
+                <Badge variant="outline">
+                  {filters.q || filters.sku} (Product Name or SKU Code)
+                </Badge>
+              )}
+              {activeFilterChips.map((chip) => (
+                <Badge key={chip.key} variant="outline">
+                  {chip.label}
+                </Badge>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-4 text-sm">
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="font-medium text-primary hover:underline"
+              >
+                {allVisibleSelected ? "Deselect All" : "Select all"}
+              </button>
+              {productCount > 0 && (
+                <span className="text-muted-foreground">
+                  You&apos;ve selected {productCount} product
+                  {productCount === 1 ? "" : "s"}, these will be added to this
+                  profile
+                </span>
+              )}
+            </div>
+
+            <ProductList
+              products={products}
+              selectedIds={selectedIds}
+              onToggle={toggleProduct}
+            />
+
+            <Separator />
+
+            <AdjustmentControls
+              adjustment={state.adjustment}
+              onChange={setAdjustment}
+            />
+
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">Preview new prices</p>
+              <Button variant="ghost" size="sm" className="text-primary">
+                <RefreshCcw className="mr-1 size-3.5" />
+                Refresh New Price Table
+              </Button>
+            </div>
+
+            <PreviewTable
+              products={selectedProducts}
+              adjustment={state.adjustment}
+            />
+
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-xs text-muted-foreground">
+                Your entries are saved automatically
+              </span>
+              <Button
+                onClick={() => markProductsCompleted(true)}
+                disabled={productCount === 0}
+              >
+                Mark as complete
+              </Button>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );
-}
-
-function scrollToCard(id: string) {
-  document
-    .getElementById(id)
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function ScopeRow({
@@ -265,4 +288,3 @@ function ScopeRow({
     </div>
   );
 }
-

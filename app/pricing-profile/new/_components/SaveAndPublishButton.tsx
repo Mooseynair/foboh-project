@@ -1,34 +1,40 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useSaveProfile } from "./ProfileFormProvider";
+import { useProfileForm, useSaveProfile } from "./ProfileFormProvider";
 
-export function SaveAsDraftButton() {
+export function SaveAndPublishButton() {
+  const router = useRouter();
+  const { state } = useProfileForm();
   const save = useSaveProfile();
   const [pending, startTransition] = useTransition();
 
+  const allComplete =
+    state.basicCompleted && state.productsCompleted && state.customersCompleted;
+
   return (
     <Button
-      variant="outline"
-      disabled={pending}
+      disabled={pending || !allComplete}
       onClick={() =>
         startTransition(async () => {
           try {
             const result = await save();
-            toast.success("Profile saved", {
+            toast.success("Profile published", {
               description: `id: ${result.profile.id}`,
             });
+            router.push("/profiles");
           } catch (err) {
-            toast.error("Could not save profile", {
+            toast.error("Could not publish profile", {
               description: err instanceof Error ? err.message : "unknown error",
             });
           }
         })
       }
     >
-      {pending ? "Saving…" : "Save as Draft"}
+      {pending ? "Publishing…" : "Save and Publish"}
     </Button>
   );
 }

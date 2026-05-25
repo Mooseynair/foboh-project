@@ -142,7 +142,11 @@ export function CheckoutPreview({
                   onValueChange={(v) => v && setCustomerId(v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a customer" />
+                    <SelectValue placeholder="Select a customer">
+                      {(v) =>
+                        customers.find((c) => c.id === v)?.name ?? v
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map((c) => (
@@ -173,7 +177,11 @@ export function CheckoutPreview({
                   onValueChange={(v) => v && setGroupId(v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a group" />
+                    <SelectValue placeholder="Select a group">
+                      {(v) =>
+                        customerGroups.find((g) => g.id === v)?.name ?? v
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {customerGroups.map((g) => (

@@ -29,7 +29,14 @@ export function ProfileBasicCard() {
               : "Name and describe this pricing profile"}
           </p>
         </div>
-        <Badge variant={completed ? "default" : "secondary"} className="shrink-0">
+        <Badge
+          variant={completed ? "default" : "secondary"}
+          className={
+            completed
+              ? "shrink-0 bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300"
+              : "shrink-0"
+          }
+        >
           {completed ? "● Completed" : "● Not Started"}
         </Badge>
       </CardHeader>

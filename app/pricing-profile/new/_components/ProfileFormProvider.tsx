@@ -20,8 +20,10 @@ export type ProfileFormState = {
   selectedProductIds: string[];
   basedOn: "globalWholesale";
   adjustment: Adjustment;
+  productsCompleted: boolean;
   selectedCustomerIds: string[];
   selectedCustomerGroupIds: string[];
+  customersCompleted: boolean;
 };
 
 type Action =
@@ -32,8 +34,10 @@ type Action =
   | { type: "setProducts"; ids: string[] }
   | { type: "clearProducts" }
   | { type: "setAdjustment"; adjustment: Adjustment }
+  | { type: "markProductsCompleted"; completed: boolean }
   | { type: "toggleCustomer"; id: string }
-  | { type: "toggleCustomerGroup"; id: string };
+  | { type: "toggleCustomerGroup"; id: string }
+  | { type: "markCustomersCompleted"; completed: boolean };
 
 const initialState: ProfileFormState = {
   name: "",
@@ -47,8 +51,10 @@ const initialState: ProfileFormState = {
     direction: "decrease",
     amount: 5,
   },
+  productsCompleted: false,
   selectedCustomerIds: [],
   selectedCustomerGroupIds: [],
+  customersCompleted: false,
 };
 
 function reducer(state: ProfileFormState, action: Action): ProfileFormState {
@@ -71,6 +77,8 @@ function reducer(state: ProfileFormState, action: Action): ProfileFormState {
       return { ...state, selectedProductIds: [] };
     case "setAdjustment":
       return { ...state, adjustment: action.adjustment };
+    case "markProductsCompleted":
+      return { ...state, productsCompleted: action.completed };
     case "toggleCustomer": {
       const set = new Set(state.selectedCustomerIds);
       if (set.has(action.id)) set.delete(action.id);
@@ -83,6 +91,8 @@ function reducer(state: ProfileFormState, action: Action): ProfileFormState {
       else set.add(action.id);
       return { ...state, selectedCustomerGroupIds: Array.from(set) };
     }
+    case "markCustomersCompleted":
+      return { ...state, customersCompleted: action.completed };
     default:
       return state;
   }
@@ -125,9 +135,13 @@ export function useProfileFormActions() {
       clearProducts: () => dispatch({ type: "clearProducts" }),
       setAdjustment: (adjustment: Adjustment) =>
         dispatch({ type: "setAdjustment", adjustment }),
+      markProductsCompleted: (completed: boolean) =>
+        dispatch({ type: "markProductsCompleted", completed }),
       toggleCustomer: (id: string) => dispatch({ type: "toggleCustomer", id }),
       toggleCustomerGroup: (id: string) =>
         dispatch({ type: "toggleCustomerGroup", id }),
+      markCustomersCompleted: (completed: boolean) =>
+        dispatch({ type: "markCustomersCompleted", completed }),
     }),
     [dispatch],
   );

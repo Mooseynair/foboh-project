@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -18,6 +19,8 @@ import {
   listProfiles,
 } from "@/lib/db/store";
 import { formatAdjustment } from "@/lib/pricing";
+
+import { DeleteProfileButton } from "./_components/DeleteProfileButton";
 
 export default async function SavedProfilesPage() {
   const [profiles, products, customers, customerGroups] = await Promise.all([
@@ -88,9 +91,15 @@ export default async function SavedProfilesPage() {
                       {profile.description}
                     </CardDescription>
                   ) : null}
+                  <CardAction>
+                    <DeleteProfileButton
+                      profileId={profile.id}
+                      profileName={profile.name}
+                    />
+                  </CardAction>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                <CardContent className="flex-1 space-y-4">
                   <Section label="Adjustment">
                     <div className="flex items-baseline gap-2">
                       <Badge variant="secondary">{adjMode}</Badge>
