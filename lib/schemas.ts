@@ -44,7 +44,6 @@ export const ProductSchema = z.object({
   subCategory: z.string(),
   segment: z.string(),
   basePrice: z.number(),
-  uom: z.string(),
 });
 
 export const CustomerGroupSchema = z.object({

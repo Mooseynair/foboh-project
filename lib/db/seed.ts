@@ -9,7 +9,6 @@ export const seedProducts: Product[] = [
     subCategory: "Wine",
     segment: "Red",
     basePrice: 279.06,
-    uom: "12 × 750ML Bottle Case",
   },
   {
     id: "koybrunv6",
@@ -19,7 +18,6 @@ export const seedProducts: Product[] = [
     subCategory: "Wine",
     segment: "Sparkling",
     basePrice: 120.0,
-    uom: "6 × 750ML Bottle Case",
   },
   {
     id: "koynr1837",
@@ -29,7 +27,6 @@ export const seedProducts: Product[] = [
     subCategory: "Wine",
     segment: "Port/Dessert",
     basePrice: 215.04,
-    uom: "12 × 375ML Bottle Case",
   },
   {
     id: "koyrie19",
@@ -39,7 +36,6 @@ export const seedProducts: Product[] = [
     subCategory: "Wine",
     segment: "White",
     basePrice: 215.04,
-    uom: "12 × 750ML Bottle Case",
   },
   {
     id: "lacbnatnv6",
@@ -49,7 +45,6 @@ export const seedProducts: Product[] = [
     subCategory: "Wine",
     segment: "Sparkling",
     basePrice: 409.32,
-    uom: "6 × 750ML Bottle Case",
   },
 ];
 
