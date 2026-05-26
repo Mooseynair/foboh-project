@@ -49,36 +49,26 @@ curl 'http://localhost:3000/api/resolve-price?customerId=bondi-cellars&productId
 
 Also browsable in the app: **`/profiles`** lists saved profiles (delete, jump back to create), **`/checkout`** is a resolve-price preview UI (pick a customer or group + products, see what the resolver returns), and **`/api-docs`** renders Swagger UI against `/api/openapi.json`.
 
-## Precedence rule
+## Precedence Rule
+The tricky part of this whole multiple-profile-matching problem is that you're trying to give the best price to the customer while also protecting margin for yourself and the supplier. It's a delicate balancing act.
 
-**Lowest final price wins.** Among all profiles that match the customer (directly or via any of their groups) AND include the product, compute each profile's final price and pick the minimum. Tie-break by `createdAt` ascending. If no profile matches, the customer pays `basePrice`.
+### The rule: lowest price wins
+Of all the profiles that match a given customer and product, the one that produces the lowest price for the customer wins.
+If no profiles match, the customer pays the base list price. If the calculation somehow produces a negative number, it gets clamped to $0.
 
-### Why this rule
-
-- **Customer-friendly by construction.** When multiple profiles legitimately apply to a customer (direct + via group, or via two groups), they get the best deal they qualify for. No surprises like "you'd have gotten a better price if you hadn't been promoted to VIP last week."
-- **Operator-friendly to reason about.** No specificity scoring, no group-size tiebreakers, no "which profile took precedence and why" debugging. The resolver's answer is mechanical and inspectable: it was the cheapest of N matching profiles, and the `why` string says exactly that.
-- **Stable under overlap.** Suppliers stacking promos (category-wide discount + customer-group loyalty program) get additive intent honored — the more aggressive promo applies, and the gentler one becomes the floor for customers who don't qualify for the deeper one.
-- **`createdAt` tiebreak is FIFO and deterministic.** When two profiles produce the same final price, the older one wins. Re-creating a profile to "win" requires deliberately deleting the old one — no accidental override from editing.
-- **Honest about its trade-off.** It costs the supplier revenue when promos overlap. That's a deliberate call: the tool is supplier-facing, but the *resolver* models what the customer actually pays, and customer trust beats squeezing the last dollar from overlap edge cases. Suppliers who don't want overlap shouldn't create overlapping profiles — the tool doesn't prevent it, but the rule doesn't reward it either.
-
-### Worked example
-
-The brief's scenario: customer **Bondi Cellars** (member of both `Independent Retailers` and `VIP`) ordering **Koyama Methode Brut Nature NV** (`$120` base) with Profiles A, B, C from the brief all matching. Each profile's final price for that product is computed; **Profile C** wins at **$95** because it produces the lowest. The `why` string returned by `/api/resolve-price` reads `"Lowest of 3 matching profiles"`.
+### Why I went with this
+As a wholesale supplier you want to stay competitive. Small differences in price get multiplied across bulk orders, so being the brand that consistently gives customers the best deal they qualify for is what keeps them coming back and pulls new ones across from competitors. That's what drives the business long-term.
+The other thing is it's just simple. There's no hidden ranking of "is sub-category more specific than brand," no judgement calls about which tier outranks which. A ranking system should only be built once you have real-world data showing which signals actually predict commercial intent. Without that, you're just guessing.
 
 ## Trade-offs
+The biggest trade-off is obviously margin. Always picking the lowest price means you're not getting the best value for the supplier. I thought about this a lot, but I landed on customer value being more important because the whole point of pricing profiles existing in the first place is to discount stock and show the best value to the customer so they're more likely to buy. If that's the main job, then growth comes from customers coming back, which comes from offering the best prices. 
+I also considered going by specificity where you weight profiles by how narrowly they target a customer or product, so a customer-specific SKU price would beat a group discount on a whole category. The problem is that without real-world data you're basically making up weights, and I couldn't justify the judgement calls (is segment more specific than brand? is sub-category? Is an independent retailer more specific than a VIP? who decides?). 
+The real reason I rejected specificity though is a customer-trust thing. Imagine a flash sale of 50% off all wine, and Bondi Cellars has a bespoke $95 price on one specific bottle that lists at $120. Under specificity-first, every wine in Bondi's cart gets 50% off except the bottle they have a "bespoke" deal on, which now costs more than the flash sale price would have. From Bondi's seat at checkout this looks like they're getting shafted on the one product their loyalty was supposed to earn them a better deal on. They feel scammed, trust breaks, and they switch suppliers. In the digital age where it's easier than ever to compare prices, that kind of mismatch errodes customer trust which ultimately pushes customers away.e.
 
-- **In-memory store, no persistence beyond process lifetime.** Brief allows it. `globalThis` singleton keeps state across hot-reloads. Swap to SQLite/Postgres without touching API or UI by reimplementing `lib/db/store.ts`.
-- **Single-page create flow, no wizard gating.** Three cards stacked vertically to match the design reference. Back/Next are visual — keeps state model simple.
-- **`Customer assignment` card is wired but minimal.** Persists into the save payload; UX is plain checkboxes, not the multi-step flow in the reference.
-- **Round half-up at the calculation boundary** (`Math.round(n * 100) / 100`). Negative results clamp to 0.
-- **OpenAPI spec is generated from Zod, not hand-authored.** Means the spec can't drift from runtime validation — but the descriptions are sparse since they're not curated.
+
 
 ## What's next
 
-1. **UI polish on the customer assignment card** — picker UX, sticky save bar, mobile nav (the sidebar is desktop-only today).
+1. **UI polish** — saw the Figma design too late. Need to align UI with exisitng UI.
 2. **Unit tests** around `calculatePrice` (rounding/clamping) and `resolvePriceForSubject` (each branch, plus the brief's worked example as an integration check). The calculation is the easiest place for subtle bugs.
 3. **Persistence** — swap the in-memory store for SQLite/Postgres without changing the API or UI surface.
-
-## AI usage
-
-Built with Claude Code (Sonnet/Opus). Full conversation transcripts are committed alongside this code. The AI did the bulk of the typing; I directed the scope, pushed back on stitched-together generic code, and made the judgement calls flagged in the trade-offs section.
