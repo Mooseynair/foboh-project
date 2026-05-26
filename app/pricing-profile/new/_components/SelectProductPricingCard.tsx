@@ -153,14 +153,16 @@ export function SelectProductPricingCard({
       </CardHeader>
       <CardContent className={completed ? undefined : "space-y-6"}>
         {completed ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => markProductsCompleted(false)}
-          >
-            <Pencil className="mr-1 size-3.5" />
-            Make Changes
-          </Button>
+          <div className="flex items-center justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markProductsCompleted(false)}
+            >
+              <Pencil className="mr-1 size-3.5" />
+              Make Changes
+            </Button>
+          </div>
         ) : (
           <>
             <div className="space-y-2">

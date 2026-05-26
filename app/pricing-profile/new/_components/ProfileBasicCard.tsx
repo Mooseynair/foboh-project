@@ -42,14 +42,16 @@ export function ProfileBasicCard() {
       </CardHeader>
       <CardContent>
         {completed ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => markBasicCompleted(false)}
-          >
-            <Pencil className="mr-1 size-3.5" />
-            Make Changes
-          </Button>
+          <div className="flex items-center justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markBasicCompleted(false)}
+            >
+              <Pencil className="mr-1 size-3.5" />
+              Make Changes
+            </Button>
+          </div>
         ) : (
           <form
             className="flex flex-col gap-3"
@@ -76,7 +78,7 @@ export function ProfileBasicCard() {
                 placeholder="What this profile is for"
               />
             </div>
-            <div>
+            <div className="flex items-center justify-end pt-2">
               <Button type="submit" size="sm" disabled={!state.name.trim()}>
                 Mark as complete
               </Button>

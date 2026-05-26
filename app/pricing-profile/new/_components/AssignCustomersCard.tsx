@@ -61,14 +61,16 @@ export function AssignCustomersCard({ customers, customerGroups }: Props) {
       </CardHeader>
       <CardContent className={completed ? undefined : "space-y-4"}>
         {completed ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => markCustomersCompleted(false)}
-          >
-            <Pencil className="mr-1 size-3.5" />
-            Make Changes
-          </Button>
+          <div className="flex items-center justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markCustomersCompleted(false)}
+            >
+              <Pencil className="mr-1 size-3.5" />
+              Make Changes
+            </Button>
+          </div>
         ) : (
           <>
             <div className="space-y-2">
