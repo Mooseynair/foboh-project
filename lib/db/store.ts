@@ -122,12 +122,10 @@ export function deleteProfile(id: string): boolean {
 }
 
 /**
- * Skeleton precedence rule — placeholder for the next pass.
- *
- * "Lowest final price wins": among all profiles that match the customer
- * (directly or via a group) AND include the product, compute each final
- * price and pick the minimum. Tie-break by createdAt ascending. The next
- * pass replaces this with a considered, specificity-based rule.
+ * Lowest-price-wins precedence: among profiles matching the customer
+ * (directly or via group) AND the product, return the one yielding the
+ * lowest final price. Tie-break by `createdAt` ascending. Falls back to
+ * base price if nothing matches. Rationale in README.md.
  */
 export function resolvePrice(
   customerId: string,

@@ -5,6 +5,11 @@ export type ResolveSubject =
   | { kind: "customer"; customerId: string; groupIds: string[] }
   | { kind: "group"; groupId: string };
 
+/**
+ * Lowest-final-price wins: among profiles matching the subject AND product,
+ * return the one yielding the lowest price. Tie-break by `createdAt` asc.
+ * Falls back to `basePrice` if nothing matches. Rationale in README.md.
+ */
 export function resolvePriceForSubject(
   subject: ResolveSubject,
   product: Product,
@@ -44,6 +49,9 @@ export function resolvePriceForSubject(
     price: best!.price,
     basePrice: product.basePrice,
     sourceProfileId: best!.profile.id,
-    why: `lowest of ${matching.length} matching profile${matching.length === 1 ? "" : "s"} (placeholder rule)`,
+    why:
+      matching.length === 1
+        ? "Only matching profile"
+        : `Lowest of ${matching.length} matching profiles`,
   };
 }
